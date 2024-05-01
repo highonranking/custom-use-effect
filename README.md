@@ -68,3 +68,42 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/d
 ### `npm run build` fails to minify
 
 This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+
+
+### CUSTOM useEffect
+
+```
+import {useRef} from "react";
+
+const useCustomEffect = (effect, deps) => {
+  const isFirstRender = useRef(true);
+  const prevDeps = useRef([]);
+
+
+  if (isFirstRender.current) {
+    isFirstRender.current = false;
+    const cleanup = effect();
+    return () => {
+      if (cleanup && typeof cleanup === "function") {
+        cleanup();
+      }
+    };
+  }
+
+  const depsChanged = deps
+    ? JSON.stringify(deps) !== JSON.stringify(prevDeps.current)
+    : true;
+
+  if (depsChanged) {
+    const cleanup = effect();
+    // Cleanup
+    if (cleanup && typeof cleanup === "function" && deps) {
+      cleanup();
+    }
+  }
+
+  prevDeps.current = deps || [];
+};
+
+export default useCustomEffect;
+```
